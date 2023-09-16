@@ -85,7 +85,7 @@ public class GraphOutputFormatterCallbackTest extends ConfiguredTargetQueryTest 
             ct -> env.getFwdDeps(ImmutableList.of(ct)),
             RepositoryMapping.ALWAYS_FALLBACK);
     env.evaluateQuery(expression, callback);
-    return Arrays.asList(output.toString().split(System.lineSeparator()));
+    return Arrays.asList(output.toString().split(options.getLineTerminator()));
   }
 
   /** Convenience method for easily injecting a config hash into an expected output sequence. */

@@ -130,7 +130,7 @@ public class FilesOutputFormatterCallbackTest extends ConfiguredTargetQueryTest 
                 false,
                 OutputGroupInfo.determineOutputGroups(outputGroups, ValidationMode.OFF, false)));
     env.evaluateQuery(expression, callback);
-    return Arrays.asList(output.toString(UTF_8).split(System.lineSeparator()));
+    return Arrays.asList(output.toString(UTF_8).split(options.getLineTerminator()));
   }
 
   @Test

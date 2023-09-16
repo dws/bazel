@@ -86,7 +86,7 @@ public class BuildOutputFormatterCallbackTest extends ConfiguredTargetQueryTest 
             getHelper().getSkyframeExecutor(),
             env.getAccessor());
     env.evaluateQuery(expression, callback);
-    return Arrays.asList(output.toString().split(System.lineSeparator()));
+    return Arrays.asList(output.toString().split(options.getLineTerminator()));
   }
 
   @Test
