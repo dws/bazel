@@ -90,10 +90,10 @@ public abstract class CqueryThreadsafeCallback
   @Override
   public void close(boolean failFast) throws InterruptedException, IOException {
     if (!failFast && printStream != null) {
+      final String lineTerm = options.getLineTerminator();
       List<String> resultsToPrint = uniquifyResults ? ImmutableSet.copyOf(result).asList() : result;
       for (String s : resultsToPrint) {
-        // TODO(ulfjack): We should use queryOptions.getLineTerminator() instead.
-        printStream.append(s).append("\n");
+        printStream.append(s).append(lineTerm);
       }
       printStream.flush();
     }
