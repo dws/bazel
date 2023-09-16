@@ -37,9 +37,22 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /** Tests cquery's {@link --output=files} format. */
+@RunWith(Parameterized.class)
 public class FilesOutputFormatterCallbackTest extends ConfiguredTargetQueryTest {
+
+  @Parameters(name = "{index}: --line_terminator_null={0}")
+  public static Object[] line_terminator_null_settings() {
+    return new Object[] { false, true };
+  }
+
+  @Parameter
+  public boolean line_terminator_null_setting;
 
   private CqueryOptions options;
   private Reporter reporter;
@@ -105,6 +118,7 @@ public class FilesOutputFormatterCallbackTest extends ConfiguredTargetQueryTest 
   public final void setUpCqueryOptions() {
     this.options = new CqueryOptions();
     this.reporter = new Reporter(new EventBus(), events::add);
+    this.options.lineTerminatorNull = line_terminator_null_setting;
   }
 
   private List<String> getOutput(String queryExpression, List<String> outputGroups)
