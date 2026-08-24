@@ -839,11 +839,17 @@ public abstract class FileArtifactValue implements SkyValue, FileArtifactMetadat
     }
 
     private static long toEpochMilli(@Nullable Instant expirationTime) {
+      if (SERVER_EXPIRATION_SENTINEL_INSTANT.equals(expirationTime)) {
+        return SERVER_EXPIRATION_SENTINEL_LONG;
+      }
       return expirationTime != null ? expirationTime.toEpochMilli() : -1;
     }
 
     @Nullable
     private static Instant fromEpochMilli(long expirationTime) {
+      if (SERVER_EXPIRATION_SENTINEL_LONG == expirationTime) {
+        return SERVER_EXPIRATION_SENTINEL_INSTANT;
+      }
       return expirationTime >= 0 ? Instant.ofEpochMilli(expirationTime) : null;
     }
 
