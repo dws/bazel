@@ -30,6 +30,7 @@ import com.google.devtools.build.lib.actions.cache.CompactPersistentActionCache;
 import com.google.devtools.build.lib.analysis.BlazeDirectories;
 import com.google.devtools.build.lib.analysis.WorkspaceStatusAction;
 import com.google.devtools.build.lib.buildtool.BuildRequestOptions;
+import com.google.devtools.build.lib.events.Event;
 import com.google.devtools.build.lib.events.NullEventHandler;
 import com.google.devtools.build.lib.events.Reporter;
 import com.google.devtools.build.lib.exec.BinTools;
@@ -408,6 +409,7 @@ public final class BlazeWorkspace {
       if (clearActionCacheServerLifetimeEntries) {
         // We only exercise this code at most once during the lifetime of the server.
         clearActionCacheServerLifetimeEntries = false;
+        var actionCacheSizeBefore = actionCache.size();
         try (AutoProfiler p = profiledAndLogged("pruning server-lifetime entries from action cache", ProfilerTask.INFO)) {
           actionCache.removeIf(
            entry ->
@@ -415,6 +417,14 @@ public final class BlazeWorkspace {
                 entry.getOutputFiles().values().stream(),
                 entry.getOutputTrees().values().stream().flatMap(tv -> tv.childValues().values().stream())
               ).anyMatch(e -> SERVER_EXPIRATION_SENTINEL_INSTANT.equals(e.getExpirationTime())));
+        }
+        var actionCacheSizeAfter = actionCache.size();
+        if (actionCacheSizeBefore != actionCacheSizeAfter) {
+          reporter.handle(Event.info(String.format(
+              "persistent action cache size: %d -> %d", actionCacheSizeBefore, actionCacheSizeAfter)));
+        } else {
+          reporter.handle(Event.info(String.format(
+              "persistent action cache size: %d", actionCacheSizeBefore)));
         }
       }
     }
