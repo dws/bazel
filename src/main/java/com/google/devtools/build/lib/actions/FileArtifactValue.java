@@ -52,6 +52,7 @@ import com.google.protobuf.CodedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
@@ -82,6 +83,23 @@ import javax.annotation.Nullable;
 @Immutable
 @ThreadSafe
 public abstract class FileArtifactValue implements SkyValue, FileArtifactMetadata {
+  // value of --experimental_remote_cache_ttl indicating server lifetime expiration
+  // We define this here instead of next to the "experimental_remote_cache_ttl" so
+  // that we can also use it here when symbolically dumping the expirationTime for
+  // a server lifetime action cache entry.
+  public static final String SERVER_EXPIRATION_KEYWORD = "server";
+
+  // value of expirationTime indicating server lifetime expiration
+  // It needs to be something other than -1, which means "never expire".
+  // Logically, this belongs with RemoteFileArtifactValue, but that is now private.
+  public static final long SERVER_EXPIRATION_SENTINEL_LONG = -2;
+
+  // These are convenience constants derived from SERVER_EXPIRATION_SENTINEL_LONG that
+  // we use to help eliminate errors that might result from inconsistently translating
+  // between long and Instant or Duration.
+  public static final Instant SERVER_EXPIRATION_SENTINEL_INSTANT = Instant.ofEpochMilli(SERVER_EXPIRATION_SENTINEL_LONG);
+  public static final Duration SERVER_EXPIRATION_SENTINEL_DURATION = Duration.ofMillis(SERVER_EXPIRATION_SENTINEL_LONG);
+
   /**
    * The type of the underlying file system object. If it is a regular file, then it is guaranteed
    * to have a digest. Otherwise it does not have a digest.
