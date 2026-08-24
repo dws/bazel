@@ -1278,7 +1278,12 @@ public class RemoteExecutionService {
             combinedCache, digestUtil, context, action.getRemotePathResolver());
 
     // The expiration time for remote cache entries.
-    var expirationTime = Instant.now().plus(remoteOptions.getRemoteCacheTtl());
+    //
+    // We use SERVER_EXPIRATION_SENTINEL if the user requested it.  Otherwise, we compute
+    // the expiration time based on the current time and remoteOptions.remoteCacheTtl.
+    var expirationTime = FileArtifactValue.SERVER_EXPIRATION_SENTINEL_DURATION.equals(remoteOptions.getRemoteCacheTtl())
+      ? FileArtifactValue.SERVER_EXPIRATION_SENTINEL_INSTANT
+      : Instant.now().plus(remoteOptions.getRemoteCacheTtl());
 
     ActionInput inMemoryOutput = null;
     AtomicReference<ByteString> inMemoryOutputData = new AtomicReference<>(null);
