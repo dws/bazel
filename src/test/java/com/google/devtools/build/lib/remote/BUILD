@@ -77,6 +77,7 @@ java_library(
             "ChunkedDiskCacheIntegrationTest.java",
             "DiskCacheIntegrationTest.java",
             "RemoteCircuitBreakerRecoveryIntegrationTest.java",
+            "ServerLifetimeIntegrationTest.java",
         ],
     ),
     deps = [
@@ -510,5 +511,34 @@ java_test(
         "//third_party/java/junit",
         "//third_party/java/truth",
         "@remoteapis//:build_bazel_remote_execution_v2_remote_execution_java_proto",
+    ],
+)
+
+java_test(
+    name = "ServerLifetimeIntegrationTest",
+    size = "large",
+    srcs = ["ServerLifetimeIntegrationTest.java"],
+    tags = ["requires-network"],
+    runtime_deps = [
+        "//third_party/java/grpc:util",
+    ],
+    deps = [
+        "//src/main/java/com/google/devtools/build/lib/actions",
+        "//src/main/java/com/google/devtools/build/lib/actions:artifacts",
+        "//src/main/java/com/google/devtools/build/lib/actions:file_metadata",
+        "//src/main/java/com/google/devtools/build/lib/authandtls/credentialhelper:credential_module",
+        "//src/main/java/com/google/devtools/build/lib/dynamic",
+        "//src/main/java/com/google/devtools/build/lib/remote:remote_module",
+        "//src/main/java/com/google/devtools/build/lib/remote/options",
+        "//src/main/java/com/google/devtools/build/lib/runtime:blaze_command_cluster",
+        "//src/main/java/com/google/devtools/build/lib/runtime:block_waiting_module",
+        "//src/main/java/com/google/devtools/build/lib/runtime:build_summary_stats_module",
+        "//src/main/java/com/google/devtools/build/lib/standalone",
+        "//src/main/java/com/google/devtools/common/options:options_internal",
+        "//src/test/java/com/google/devtools/build/lib/buildtool/util",
+        "//src/test/java/com/google/devtools/build/lib/remote/util:integration_test_utils",
+        "//third_party/java/guava:collect",
+        "//third_party/java/guava:eventbus",
+        "//third_party/java/truth",
     ],
 )
