@@ -110,9 +110,12 @@ public class RemoteLeaseExtension implements LeaseExtension {
 
   private void doExtendLeases() {
     var valuesMap = memoizingEvaluator.getValues();
-    // We will extend leases for all known outputs so the earliest time when one output could be
-    // expired is (now + ttl).
-    var earliestExpiration = Instant.now().plus(remoteCacheTtl);
+    // We use SERVER_EXPIRATION_SENTINEL if the user requested it.  Otherwise, we will extend
+    // leases for all known outputs so the earliest time when one output could be expired is
+    // (now + ttl).
+    var earliestExpiration = FileArtifactValue.SERVER_EXPIRATION_SENTINEL_DURATION.equals(remoteCacheTtl)
+      ? FileArtifactValue.SERVER_EXPIRATION_SENTINEL_INSTANT
+      : Instant.now().plus(remoteCacheTtl);
 
     try {
       for (var entry : valuesMap.entrySet()) {
