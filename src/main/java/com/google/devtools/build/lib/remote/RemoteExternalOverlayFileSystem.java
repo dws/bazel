@@ -215,6 +215,11 @@ public final class RemoteExternalOverlayFileSystem extends FileSystem
     var filesToPrefetch = new LinkedHashSet<PathFragment>();
     var symlinksToPrefetch = new ArrayList<PathFragment>();
     externalFs.createDirectoryAndParents(repoDir.getParentDirectory());
+    // We use SERVER_EXPIRATION_SENTINEL if the user requested it.  Otherwise, we compute
+    // the expiration time based on the current time and remoteCacheTtl.
+    var expirationTime = FileArtifactValue.SERVER_EXPIRATION_SENTINEL_DURATION.equals(remoteCacheTtl)
+      ? FileArtifactValue.SERVER_EXPIRATION_SENTINEL_INSTANT
+      : Instant.now().plus(remoteCacheTtl);
     injectRecursively(
         externalFs,
         repoDir,
@@ -223,7 +228,7 @@ public final class RemoteExternalOverlayFileSystem extends FileSystem
         childMap,
         filesToPrefetch::add,
         symlinksToPrefetch::add,
-        Instant.now().plus(remoteCacheTtl));
+        expirationTime);
     addSymlinkTargetsToPrefetch(symlinksToPrefetch, filesToPrefetch);
     try {
       // TODO: This prefetches a large number of small files. Investigate whether BatchReadBlobs
