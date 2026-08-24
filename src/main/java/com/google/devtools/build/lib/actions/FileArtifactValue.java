@@ -915,7 +915,11 @@ public abstract class FileArtifactValue implements SkyValue, FileArtifactMetadat
           .add("digest", bytesToString(getDigest()))
           .add("size", getSize())
           .add("locationIndex", getLocationIndex())
-          .add("expirationTime", fromEpochMilli(expirationTime))
+          .add("expirationTime", expirationTime == SERVER_EXPIRATION_SENTINEL_LONG
+                                 ? SERVER_EXPIRATION_KEYWORD
+                                 : expirationTime < 0
+                                 ? "never"
+                                 : fromEpochMilli(expirationTime))
           .add("proxy", proxy)
           .add("inMemoryOutput", inMemoryOutput)
           .toString();
